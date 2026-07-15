@@ -65,13 +65,6 @@ export default function Homepage() {
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans text-gray-900">
-
-      <header className="px-6 py-4 max-w-7xl mx-auto bg-white border-b border-gray-200">
-        <div className="text-3xl font-black tracking-wider text-black select-none">
-          BENZYO
-        </div>
-      </header>
-
       <div className="bg-[#FF0000] text-white py-2 overflow-hidden relative w-full font-medium italic border-b border-red-700">
         <div className="whitespace-nowrap animate-marquee flex gap-12">
           <span>Breaking News: Benzyo launches fully functional Instagram-style enterprise dashboard feed layout...</span>
@@ -95,7 +88,7 @@ export default function Homepage() {
                 <span className="text-xs text-gray-400 font-medium">{post.time}</span>
               </div>
 
-              <div className="w-full relative bg-gray-100 aspect-[1080/1350] overflow-hidden">
+              <div className="w-full relative bg-gray-100 aspect-1080/1350 overflow-hidden">
                 <img
                   src={post.image}
                   alt="Benzyo News Visual"

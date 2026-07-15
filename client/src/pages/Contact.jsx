@@ -60,19 +60,19 @@ const Contact = () => {
     <div className="min-h-screen bg-[#f1f1f1] flex items-center justify-center px-4 py-12 relative overflow-hidden">
       {/* Animated background circles */}
       <motion.div
-        className="absolute top-[-30%] left-[-10%] w-[700px] h-[700px] rounded-full bg-[#ff0000]/5 blur-3xl"
+        className="absolute top-[-30%] left-[-10%] w-175 h-175 rounded-full bg-[#ff0000]/5 blur-3xl"
         animate={{ x: [0, 80, 0], y: [0, -60, 0] }}
         transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
-        className="absolute bottom-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full bg-black/5 blur-3xl"
+        className="absolute bottom-[-20%] right-[-10%] w-150 h-150 rounded-full bg-black/5 blur-3xl"
         animate={{ x: [0, -50, 0], y: [0, 40, 0] }}
         transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
       />
 
       <div className="max-w-6xl w-full relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-8 bg-white/60 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden border border-white/50">
         {/* LEFT SIDE – Brand & Info */}
-        <div className="bg-gradient-to-br from-[#ff0000] to-black p-8 md:p-12 flex flex-col justify-between text-white">
+        <div className="bg-linear-to-br from-[#ff0000] to-black p-8 md:p-12 flex flex-col justify-between text-white">
           <div>
             
 

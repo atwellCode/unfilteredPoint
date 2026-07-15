@@ -104,7 +104,7 @@ const Navbar = () => {
                     <span className="relative z-10">{item.name}</span>
                     {!isActive && (
                       <motion.span
-                        className="absolute bottom-0 left-0 w-full h-[2px] bg-[#ff0000]"
+                        className="absolute bottom-0 left-0 w-full h-1 bg-[#ff0000]"
                         initial={{ scaleX: 0 }}
                         whileHover={{ scaleX: 1 }}
                         transition={{ type: "spring", stiffness: 300 }}
