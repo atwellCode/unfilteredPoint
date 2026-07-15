@@ -3,6 +3,7 @@ import Homepage from "./pages/Homepage"
 import Blog from './pages/Blog'
 import Cateogory from './pages/Cateogory'
 import Contact from './pages/Contact'
+import Admin from './pages/Admin'
 
 const App = () => {
   return (
@@ -11,6 +12,7 @@ const App = () => {
     <Blog/>
     <Cateogory/>
     <Contact/>
+    <Admin/>
    </div>
   )
 }

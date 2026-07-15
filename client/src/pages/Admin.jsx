@@ -2,7 +2,11 @@ import React from 'react'
 
 const Admin = () => {
   return (
-    <div>Admin</div>
+    <div>
+      <p>
+        this is our new admin panel folder
+        </p>
+    </div>
   )
 }
 
