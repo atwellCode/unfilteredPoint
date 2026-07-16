@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 
 const MainFeedSection = () => {
-    const [likes, setLikes] = useState({ 1: false, 2: false, 3: false });
-    const [activeNews, setActiveNews] = useState(null);
-
-    const feedPosts = [
+    // Left feed posts state with initial likes and pre-filled comments
+    const [feedPosts, setFeedPosts] = useState([
         {
             id: 1,
             tag: "Benzyo Tech",
@@ -12,6 +10,8 @@ const MainFeedSection = () => {
             description: "Benzyo has officially unveiled its latest enterprise solutions dashboard today. The platform aims to reduce data processing times by 40% using advanced internal automation pipelines. Corporate clients from 15 countries have already signed up for the beta testing phase which starts next week.",
             time: "2 hours ago",
             image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=60",
+            likesCount: 5,
+            comments: ["Great innovation!", "Can't wait to test the beta version."]
         },
         {
             id: 2,
@@ -20,6 +20,8 @@ const MainFeedSection = () => {
             description: "Following a successful funding round, Benzyo is expanding its physical footprint. The new offices will house over 500 new developers and product managers. According to the board of directors, this expansion will focus heavily on scaling decentralized network tools for modern businesses.",
             time: "5 hours ago",
             image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1080&auto=format&fit=crop&q=80",
+            likesCount: 12,
+            comments: ["Phenomenal growth!", "Is Pakistan listed in the new hubs?"]
         },
         {
             id: 3,
@@ -28,8 +30,18 @@ const MainFeedSection = () => {
             description: "In a recent case study, Benzyo's product design team revealed that shifting from traditional corporate news designs to interactive, media-centric feeds drastically improved daily active usage. Users spent an average of 18 minutes longer engaging with corporate announcements.",
             time: "1 day ago",
             image: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=800&auto=format&fit=crop&q=60",
+            likesCount: 24,
+            comments: ["Clean layout always wins.", "User experience is top notch here."]
         },
-    ];
+    ]);
+
+    const [userLikes, setUserLikes] = useState({}); // Tracks if the current user liked a post
+    const [activeNews, setActiveNews] = useState(null);
+
+    // Instagram Comment Modal State
+    const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
+    const [activePostForComment, setActivePostForComment] = useState(null);
+    const [newCommentText, setNewCommentText] = useState("");
 
     const pickForYouPosts = [
         {
@@ -55,12 +67,67 @@ const MainFeedSection = () => {
         }
     ];
 
-    const toggleLike = (id) => {
-        setLikes(prev => ({ ...prev, [id]: !prev[id] }));
+    // Responsive Action Toggle for Likes
+    const toggleLike = (postId) => {
+        const hasLiked = userLikes[postId];
+
+        // Toggle user's specific state
+        setUserLikes(prev => ({ ...prev, [postId]: !hasLiked }));
+
+        // Increment/Decrement overall database/state counter
+        setFeedPosts(prevPosts =>
+            prevPosts.map(post => {
+                if (post.id === postId) {
+                    return {
+                        ...post,
+                        likesCount: hasLiked ? post.likesCount - 1 : post.likesCount + 1
+                    };
+                }
+                return post;
+            })
+        );
     };
 
-    const handleAction = (type, title) => {
-        alert(`${type} clicked for: "${title}"`);
+    // Open Comment Modal Panel
+    const openCommentModal = (post) => {
+        setActivePostForComment(post);
+        setIsCommentModalOpen(true);
+    };
+
+    // Close Comment Modal Panel
+    const closeCommentModal = () => {
+        setIsCommentModalOpen(false);
+        setActivePostForComment(null);
+        setNewCommentText("");
+    };
+
+    // Form submission inside comment box
+    const handleAddComment = (e) => {
+        e.preventDefault();
+        if (!newCommentText.trim()) return;
+
+        setFeedPosts(prevPosts =>
+            prevPosts.map(post => {
+                if (post.id === activePostForComment.id) {
+                    const updatedComments = [...post.comments, newCommentText];
+                    // instantly sync local copy visual inside active modal viewport
+                    setActivePostForComment({ ...post, comments: updatedComments });
+                    return { ...post, comments: updatedComments };
+                }
+                return post;
+            })
+        );
+        setNewCommentText("");
+    };
+
+    // Web API Sharing trigger
+    const handleShare = (title) => {
+        if (navigator.share) {
+            navigator.share({ title: title, url: window.location.href })
+                .catch(console.error);
+        } else {
+            alert(`Copied link for post: "${title}"`);
+        }
     };
 
     return (
@@ -69,6 +136,8 @@ const MainFeedSection = () => {
             <div className="lg:col-span-2 flex flex-col gap-8">
                 {feedPosts.map((post) => (
                     <div key={post.id} className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
+
+                        {/* Header */}
                         <div className="p-4 flex items-center justify-between border-b border-gray-100">
                             <div className="flex items-center gap-2">
                                 <div className="w-8 h-8 rounded-full bg-[#FF0000] flex items-center justify-center text-white text-xs font-bold">B</div>
@@ -77,31 +146,49 @@ const MainFeedSection = () => {
                             <span className="text-xs text-gray-400 font-medium">{post.time}</span>
                         </div>
 
+                        {/* Visual Image Layout */}
                         <div className="w-full relative bg-gray-100 aspect-[1080/1350] overflow-hidden">
                             <img src={post.image} alt="Benzyo News Visual" className="w-full h-full object-cover" />
                         </div>
 
-                        <div className="p-4 flex items-center justify-between border-t border-b border-gray-100 bg-white">
-                            <div className="flex items-center gap-5">
-                                <button onClick={() => toggleLike(post.id)} className={`transition-colors focus:outline-none ${likes[post.id] ? 'text-red-500 scale-110' : 'text-gray-700 hover:text-red-500'}`}>
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill={likes[post.id] ? "currentColor" : "none"} viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-                                    </svg>
-                                </button>
-                                <button onClick={() => handleAction('Comment Box', post.title)} className="text-gray-700 hover:text-blue-500 transition-colors focus:outline-none">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48L4.25 21.25l3.811-1c1.138.38 2.363.57 3.614.57Z" />
-                                    </svg>
-                                </button>
-                                <button onClick={() => handleAction('Share Link', post.title)} className="text-gray-700 hover:text-green-500 transition-colors focus:outline-none">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L6 12Zm0 0h7.5" />
-                                    </svg>
+                        {/* Interactive Buttons Bar */}
+                        <div className="p-4 flex flex-col gap-2 border-t border-b border-gray-100 bg-white">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-5">
+                                    {/* Like Button */}
+                                    <button onClick={() => toggleLike(post.id)} className={`transition-transform duration-100 focus:outline-none active:scale-95 ${userLikes[post.id] ? 'text-red-500 scale-110' : 'text-gray-700 hover:text-red-500'}`}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill={userLikes[post.id] ? "currentColor" : "none"} viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                                        </svg>
+                                    </button>
+
+                                    {/* Comment Trigger Modal icon */}
+                                    <button onClick={() => openCommentModal(post)} className="text-gray-700 hover:text-red-500 transition-colors focus:outline-none">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48L4.25 21.25l3.811-1c1.138.38 2.363.57 3.614.57Z" />
+                                        </svg>
+                                    </button>
+
+                                    {/* Share Trigger button */}
+                                    <button onClick={() => handleShare(post.title)} className="text-gray-700 hover:text-red-500 transition-colors focus:outline-none">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L6 12Zm0 0h7.5" />
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                <button onClick={() => setActiveNews(activeNews === post.id ? null : post.id)} className="text-xs font-bold text-[#FF0000] bg-red-50 px-3 py-1.5 rounded-lg hover:bg-red-100 transition-colors uppercase tracking-wider">
+                                    {activeNews === post.id ? "Hide News ↑" : "Read More →"}
                                 </button>
                             </div>
-                            <button onClick={() => setActiveNews(activeNews === post.id ? null : post.id)} className="text-xs font-bold text-[#FF0000] bg-red-50 px-3 py-1.5 rounded-lg hover:bg-red-100 transition-colors uppercase tracking-wider">
-                                {activeNews === post.id ? "Hide News ↑" : "Read More →"}
-                            </button>
+
+                            {/* Sub counts */}
+                            <div className="flex gap-4 text-xs font-extrabold text-gray-700 mt-1 px-0.5">
+                                <span>{post.likesCount} likes</span>
+                                <span className="cursor-pointer hover:underline" onClick={() => openCommentModal(post)}>
+                                    {post.comments.length} comments
+                                </span>
+                            </div>
                         </div>
 
                         <div className="p-4 bg-white">
@@ -134,6 +221,61 @@ const MainFeedSection = () => {
                     </div>
                 </div>
             </div>
+
+            {/* DYNAMIC INSTAGRAM-STYLE COMMENT MODAL */}
+            {isCommentModalOpen && activePostForComment && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+                    <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl flex flex-col max-h-[80vh] overflow-hidden">
+
+                        {/* Header of Popup */}
+                        <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                            <h3 className="font-extrabold text-gray-900 text-base">Comments</h3>
+                            <button onClick={closeCommentModal} className="p-1.5 rounded-full hover:bg-gray-200 text-gray-500 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        {/* List of comments */}
+                        <div className="p-4 flex-1 overflow-y-auto space-y-4 min-h-[250px]">
+                            {activePostForComment.comments.length === 0 ? (
+                                <p className="text-center text-sm text-gray-400 py-8">Be the first to leave a comment!</p>
+                            ) : (
+                                activePostForComment.comments.map((comment, index) => (
+                                    <div key={index} className="flex gap-3 items-start">
+                                        <div className="w-7 h-7 bg-red-100 rounded-full flex items-center justify-center font-bold text-xs text-[#FF0000] flex-shrink-0">
+                                            #
+                                        </div>
+                                        <div className="bg-gray-50 rounded-2xl p-3 text-sm text-gray-800 max-w-[85%] break-words">
+                                            {comment}
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+
+                        {/* Input Box Footer */}
+                        <form onSubmit={handleAddComment} className="p-4 border-t border-gray-100 flex gap-2 items-center bg-white">
+                            <input
+                                type="text"
+                                placeholder="Write a comment..."
+                                value={newCommentText}
+                                onChange={(e) => setNewCommentText(e.target.value)}
+                                className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF0000] focus:border-transparent transition-all"
+                            />
+                            <button
+                                type="submit"
+                                disabled={!newCommentText.trim()}
+                                className="text-[#FF0000] font-bold text-sm px-4 py-2 hover:bg-red-50 rounded-lg transition-all disabled:opacity-40 disabled:hover:bg-transparent"
+                            >
+                                Post
+                            </button>
+                        </form>
+
+                    </div>
+                </div>
+            )}
         </main>
     );
 };

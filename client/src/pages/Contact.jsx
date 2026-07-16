@@ -74,7 +74,7 @@ const Contact = () => {
         {/* LEFT SIDE – Brand & Info */}
         <div className="bg-linear-to-br from-[#ff0000] to-black p-8 md:p-12 flex flex-col justify-between text-white">
           <div>
-            
+
 
             <motion.h2
               initial={{ opacity: 0 }}
