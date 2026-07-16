@@ -42,8 +42,8 @@ const Footer = () => {
     <footer className="bg-black text-gray-300 pt-16 pb-4 overflow-hidden">
       {/* Top decorative border */}
       <div className="relative">
-        <div className="absolute top-0 left-0 w-1/3 h-1 bg-gradient-to-r from-[#ff0000] to-transparent" />
-        <div className="absolute top-0 right-0 w-1/3 h-1 bg-gradient-to-l from-[#ff0000] to-transparent" />
+        <div className="absolute top-0 left-0 w-1/3 h-1 bg-linear-to-r from-[#ff0000] to-transparent" />
+        <div className="absolute top-0 right-0 w-1/3 h-1 bg-linear-to-l from-[#ff0000] to-transparent" />
         <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-[#ff0000] rounded-full" />
       </div>
 
