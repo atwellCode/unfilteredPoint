@@ -4,15 +4,16 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 // Pages
 import Homepage from "./pages/Homepage";
 import Blog from './pages/Blog';
-import Category from './pages/Cateogory'; // Fixed typo in path: 'Cateogory' -> 'Category'
+import Category from './pages/Cateogory';
 import CategoryPosts from './pages/CategoryPosts';
 import Contact from './pages/Contact';
 import Admin from './pages/Admin';
 
 // Components
 import Navbar from './components/Navbar';
+import NewsPage from './components/NewsPage'; // Fixed: folder lowercase 'components' aur file exact name 'NewsPage'
 import Footer from './components/Footer';
-import BlogDetailPage from "./components/BlogDetailPage"; // Normalized 'Components' to lowercase 'components'
+import BlogDetailPage from "./components/BlogDetailPage";
 import ScrollToTop from "./components/ScrollToTop";
 import ScrollToTopOnRouteChange from "./components/ScrollToTopOnRouteChange";
 
@@ -26,6 +27,7 @@ const App = () => {
         <main className="min-h-screen">
           <Routes>
             <Route path="/" element={<Homepage />} />
+            <Route path="/news" element={<NewsPage />} />
             <Route path="/blogs" element={<Blog />} />
             <Route path="/blog/:id" element={<BlogDetailPage />} />
             <Route path="/category" element={<Category />} />

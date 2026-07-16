@@ -10,6 +10,7 @@ import {
   HiBookOpen,
   HiTag,
   HiMail,
+  HiGlobeAlt, // Naya icon news ke liye
 } from "react-icons/hi";
 
 const Navbar = () => {
@@ -27,14 +28,15 @@ const Navbar = () => {
   const closeMenu = () => setIsOpen(false);
   const toggleSearch = () => setSearchOpen(!searchOpen);
 
+  // Home ke baad aur Blogs se pehle News add kar diya hai
   const navItems = [
     { name: "Home", path: "/", icon: HiHome },
+    { name: "News", path: "/news", icon: HiGlobeAlt },
     { name: "Blogs", path: "/blogs", icon: HiBookOpen },
     { name: "Category", path: "/category", icon: HiTag },
     { name: "Contact", path: "/contact", icon: HiMail },
   ];
 
-  // Mobile menu variants
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -50,7 +52,6 @@ const Navbar = () => {
     exit: { y: 20, opacity: 0 },
   };
 
-  // Search bar slide animation
   const searchBarVariants = {
     hidden: { height: 0, opacity: 0 },
     visible: { height: "auto", opacity: 1, transition: { duration: 0.3 } },
@@ -59,16 +60,13 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`sticky top-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? "bg-white/80 backdrop-blur-md shadow-lg"
-          : "bg-white shadow-md"
-      }`}
+      className={`sticky top-0 z-50 transition-all duration-300 ${scrolled
+        ? "bg-white/80 backdrop-blur-md shadow-lg"
+        : "bg-white shadow-md"
+        }`}
     >
-      {/* Main navbar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Left: Logo */}
           <NavLink to="/" className="flex items-center space-x-2 group">
             <motion.div
               whileHover={{ rotate: 360, scale: 1.1 }}
@@ -85,17 +83,15 @@ const Navbar = () => {
             </motion.span>
           </NavLink>
 
-          {/* Center: Desktop Nav Items */}
           <div className="hidden md:flex items-center justify-center flex-1 space-x-1">
             {navItems.map((item) => (
               <NavLink
                 key={item.name}
                 to={item.path}
                 className={({ isActive }) =>
-                  `relative px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wide transition-all duration-200 ${
-                    isActive
-                      ? "text-white bg-[#ff0000] shadow-md"
-                      : "text-black hover:bg-[#ff0000]/10 hover:text-[#ff0000]"
+                  `relative px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wide transition-all duration-200 ${isActive
+                    ? "text-white bg-[#ff0000] shadow-md"
+                    : "text-black hover:bg-[#ff0000]/10 hover:text-[#ff0000]"
                   }`
                 }
               >
@@ -116,9 +112,7 @@ const Navbar = () => {
             ))}
           </div>
 
-          {/* Right: Search & Subscribe */}
           <div className="flex items-center space-x-3">
-            {/* Search Icon */}
             <button
               onClick={toggleSearch}
               className="text-black hover:text-[#ff0000] transition-colors p-2 rounded-full hover:bg-[#f1f1f1]"
@@ -127,7 +121,6 @@ const Navbar = () => {
               <HiSearch className="h-5 w-5" />
             </button>
 
-            {/* Subscribe Button (Desktop) */}
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -137,25 +130,19 @@ const Navbar = () => {
               Subscribe
             </motion.button>
 
-            {/* Mobile Menu Button */}
             <div className="md:hidden">
               <button
                 onClick={toggleMenu}
                 className="text-black focus:outline-none p-2 rounded-lg hover:bg-[#f1f1f1] transition-colors"
                 aria-label="Toggle menu"
               >
-                {isOpen ? (
-                  <HiX className="h-6 w-6" />
-                ) : (
-                  <HiMenu className="h-6 w-6" />
-                )}
+                {isOpen ? <HiX className="h-6 w-6" /> : <HiMenu className="h-6 w-6" />}
               </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Search Bar Overlay */}
       <AnimatePresence>
         {searchOpen && (
           <motion.div
@@ -174,10 +161,7 @@ const Navbar = () => {
                   className="flex-1 px-4 py-2 border border-[#f1f1f1] rounded-full focus:outline-none focus:ring-2 focus:ring-[#ff0000] focus:border-transparent transition-shadow"
                   autoFocus
                 />
-                <button
-                  onClick={toggleSearch}
-                  className="text-black hover:text-[#ff0000] transition-colors p-2"
-                >
+                <button onClick={toggleSearch} className="text-black hover:text-[#ff0000] transition-colors p-2">
                   <HiX className="h-6 w-6" />
                 </button>
               </div>
@@ -186,7 +170,6 @@ const Navbar = () => {
         )}
       </AnimatePresence>
 
-      {/* Mobile Navigation Menu */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -217,10 +200,9 @@ const Navbar = () => {
                       to={item.path}
                       onClick={closeMenu}
                       className={({ isActive }) =>
-                        `flex items-center justify-center gap-4 py-3 px-6 rounded-xl transition-all duration-200 ${
-                          isActive
-                            ? "bg-[#ff0000] text-white shadow-lg"
-                            : "text-black hover:bg-[#ff0000]/10"
+                        `flex items-center justify-center gap-4 py-3 px-6 rounded-xl transition-all duration-200 ${isActive
+                          ? "bg-[#ff0000] text-white shadow-lg"
+                          : "text-black hover:bg-[#ff0000]/10"
                         }`
                       }
                     >
@@ -231,7 +213,6 @@ const Navbar = () => {
                 );
               })}
 
-              {/* Mobile Subscribe Button */}
               <motion.button
                 variants={itemVariants}
                 whileHover={{ scale: 1.05 }}
