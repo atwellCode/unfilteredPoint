@@ -4,27 +4,11 @@
     "name": "Politics",
     "slug": "politics",
     "description": "Latest political news, analysis, and opinions from around the world.",
-    "icon": "GiPolitics",
-    "color": "#ff0000"
+    "icon": "FaBalanceScale",
+    "color": "#dc2626"
   },
   {
     "id": 2,
-    "name": "Technology",
-    "slug": "technology",
-    "description": "Cutting-edge tech trends, gadget reviews, and digital innovations.",
-    "icon": "SiTechCrunch",
-    "color": "#2563eb"
-  },
-  {
-    "id": 3,
-    "name": "Health",
-    "slug": "health",
-    "description": "Wellness tips, medical breakthroughs, and healthy living guides.",
-    "icon": "FaHeartbeat",
-    "color": "#16a34a"
-  },
-  {
-    "id": 4,
     "name": "Business",
     "slug": "business",
     "description": "Financial news, market insights, and entrepreneurship stories.",
@@ -32,7 +16,47 @@
     "color": "#f59e0b"
   },
   {
+    "id": 3,
+    "name": "Technology",
+    "slug": "technology",
+    "description": "Cutting-edge tech trends, gadget reviews, and digital innovations.",
+    "icon": "FaMicrochip",
+    "color": "#2563eb"
+  },
+  {
+    "id": 4,
+    "name": "Science",
+    "slug": "science",
+    "description": "Discoveries, space exploration, and scientific breakthroughs.",
+    "icon": "FaFlask",
+    "color": "#7c3aed"
+  },
+  {
     "id": 5,
+    "name": "Environment",
+    "slug": "environment",
+    "description": "Climate change, conservation, and environmental sustainability.",
+    "icon": "FaLeaf",
+    "color": "#16a34a"
+  },
+  {
+    "id": 6,
+    "name": "Health",
+    "slug": "health",
+    "description": "Wellness tips, medical breakthroughs, and healthy living guides.",
+    "icon": "FaHeartbeat",
+    "color": "#ef4444"
+  },
+  {
+    "id": 7,
+    "name": "Sports",
+    "slug": "sports",
+    "description": "Live scores, match reports, and athlete interviews from every game.",
+    "icon": "FaFootballBall",
+    "color": "#8b5cf6"
+  },
+  {
+    "id": 8,
     "name": "Entertainment",
     "slug": "entertainment",
     "description": "Movies, music, celebrity news, and pop culture highlights.",
@@ -40,11 +64,51 @@
     "color": "#ec4899"
   },
   {
-    "id": 6,
-    "name": "Sports",
-    "slug": "sports",
-    "description": "Live scores, match reports, and athlete interviews from every game.",
-    "icon": "FaFootballBall",
-    "color": "#8b5cf6"
+    "id": 9,
+    "name": "Lifestyle",
+    "slug": "lifestyle",
+    "description": "Fashion, travel, food, and everyday living inspiration.",
+    "icon": "FaHeart",
+    "color": "#f43f5e"
+  },
+  {
+    "id": 10,
+    "name": "World",
+    "slug": "world",
+    "description": "International news, global affairs, and diplomatic relations.",
+    "icon": "FaGlobe",
+    "color": "#3b82f6"
+  },
+  {
+    "id": 11,
+    "name": "Local",
+    "slug": "local",
+    "description": "Community news, local events, and regional updates.",
+    "icon": "FaCity",
+    "color": "#14b8a6"
+  },
+  {
+    "id": 12,
+    "name": "Crime",
+    "slug": "crime",
+    "description": "Law enforcement, criminal justice, and public safety reports.",
+    "icon": "FaGavel",
+    "color": "#b91c1c"
+  },
+  {
+    "id": 13,
+    "name": "Education",
+    "slug": "education",
+    "description": "Schools, universities, learning resources, and academic research.",
+    "icon": "FaGraduationCap",
+    "color": "#4f46e5"
+  },
+  {
+    "id": 14,
+    "name": "Opinion",
+    "slug": "opinion",
+    "description": "Editorials, personal perspectives, and thought-provoking commentary.",
+    "icon": "FaComment",
+    "color": "#6b7280"
   }
 ]

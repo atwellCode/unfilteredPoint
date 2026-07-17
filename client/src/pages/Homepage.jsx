@@ -2,6 +2,7 @@ import React from 'react';
 import Marquee from '../Components/Marquee';
 import TrendingSection from '../Components/TrendingSection';
 import MainFeedSection from '../Components/MainFeedSection';
+import NewsMarquee from '../components/NewsMarquee';
 
 const Homepage = () => {
   return (
@@ -9,9 +10,9 @@ const Homepage = () => {
 
       <Marquee />
       <TrendingSection />
+      <NewsMarquee/>
       <MainFeedSection />
-
-
+      
     </div>
   );
 };

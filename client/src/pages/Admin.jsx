@@ -48,6 +48,13 @@ const categories = [
   "disasters",
   "breaking news",
   "local",
+  "business",
+  "science",
+  "environment",
+  "lifestyle",
+  "world",
+  "crime",
+  "Opinion"
 ];
 
 const daysOfWeek = [
@@ -642,7 +649,7 @@ const Admin = () => {
 
         {/* Filters */}
         <div className="flex flex-wrap items-center gap-4 mb-6">
-          <div className="flex items-center gap-2 bg-white rounded-full px-4 py-1 shadow-sm flex-1 min-w-[200px]">
+          <div className="flex items-center gap-2 bg-white rounded-full px-4 py-1 shadow-sm flex-1 min-w-50">
             <HiSearch className="text-gray-400" />
             <input
               type="text"
@@ -698,7 +705,7 @@ const Admin = () => {
                   {filteredPosts.map((post) => (
                     <tr key={post.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-4 py-3 text-gray-500">{post.id}</td>
-                      <td className="px-4 py-3 font-medium text-black max-w-[200px] truncate">
+                      <td className="px-4 py-3 font-medium text-black max-w-50 truncate">
                         {post.heading}
                       </td>
                       <td className="px-4 py-3">

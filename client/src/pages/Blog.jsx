@@ -1,158 +1,306 @@
-import React, { useState } from 'react';
-// 1. Pehle useNavigate hook ko import karein
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import {
+  FaBalanceScale,
+  FaBuilding,
+  FaMicrochip,
+  FaFlask,
+  FaLeaf,
+  FaHeartbeat,
+  FaFootballBall,
+  FaFilm,
+  FaHeart,
+  FaGlobe,
+  FaCity,
+  FaGavel,
+  FaGraduationCap,
+  FaComment,
+} from "react-icons/fa";
+import categoriesData from "../data/categories.json";
 
-const DUMMY_BLOGS = [
-  {
-    id: 1,
-    title: "Benzyo launches fully functional Instagram-style enterprise dashboard portal layout",
-    description: "Explore the newly released layout updates that bring social-media aesthetics into high-performance enterprise systems. Built for modern fast-paced teams.",
-    category: "technology",
-    image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=600&q=80",
-    date: "15 July 2026"
-  },
-  {
-    id: 2,
-    title: "How local sports clubs are leveraging real-time analytics to boost player safety",
-    description: "A deep dive into how data tracking devices and local club systems are working together to prevent major injuries and optimize on-field performance metrics.",
-    category: "sports",
-    image: "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=600&q=80",
-    date: "14 July 2026"
-  },
-  {
-    id: 3,
-    title: "Global summits set eyes on artificial intelligence regulation protocols for late 2026",
-    description: "World leaders are gathering to discuss the unified framework required to regulate safety, copyright, and ethical deployment of next-generation autonomous models.",
-    category: "politics",
-    image: "https://images.unsplash.com/photo-1540910419892-4a36d2c3266c?auto=format&fit=crop&w=600&q=80",
-    date: "13 July 2026"
-  },
-  {
-    id: 4,
-    title: "The rise of ultra-fast localized rendering engines in next-gen web frameworks",
-    description: "Traditional rendering is giving way to hybrid architectures that deliver sub-millisecond load times. Here is how it impacts enterprise application development.",
-    category: "technology",
-    image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600&q=80",
-    date: "12 July 2026"
-  },
-  {
-    id: 5,
-    title: "Decentralized sports broadcasting: Empowering individual creators worldwide",
-    description: "Why high-tier sports networks are moving towards micro-licensing, giving smaller content creators the rights to stream matches with local commentary.",
-    category: "sports",
-    image: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=600&q=80",
-    date: "10 July 2026"
-  }
-];
-
-const BlogSection = () => {
-  const [activeCategory, setActiveCategory] = useState('all');
-
-  // 2. Navigation function initialize karein
+const Blog = () => {
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [activeCategory, setActiveCategory] = useState("all");
   const navigate = useNavigate();
 
-  const filteredBlogs = activeCategory === 'all'
-    ? DUMMY_BLOGS
-    : DUMMY_BLOGS.filter(blog => blog.category === activeCategory);
+  const iconMap = {
+    FaBalanceScale: FaBalanceScale,
+    FaBuilding: FaBuilding,
+    FaMicrochip: FaMicrochip,
+    FaFlask: FaFlask,
+    FaLeaf: FaLeaf,
+    FaHeartbeat: FaHeartbeat,
+    FaFootballBall: FaFootballBall,
+    FaFilm: FaFilm,
+    FaHeart: FaHeart,
+    FaGlobe: FaGlobe,
+    FaCity: FaCity,
+    FaGavel: FaGavel,
+    FaGraduationCap: FaGraduationCap,
+    FaComment: FaComment,
+  };
 
-  const categories = [
-    { id: 'all', label: 'All' },
-    { id: 'sports', label: 'Sports' },
-    { id: 'technology', label: 'Technology' },
-    { id: 'politics', label: 'Politics' }
-  ];
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch("http://localhost:3001/posts");
+        if (!res.ok) throw new Error("Failed to fetch posts");
+        const data = await res.json();
+        const blogPosts = data.filter(
+          (p) => p.type === "blog" && p.status === "active"
+        );
+        setPosts(blogPosts);
+      } catch (err) {
+        console.error(err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPosts();
+  }, []);
+
+  const filteredPosts =
+    activeCategory === "all"
+      ? posts
+      : posts.filter((post) => post.category === activeCategory);
+
+  const getPostCount = (slug) => posts.filter((p) => p.category === slug).length;
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+    const [year, month, day] = dateStr.split("-");
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+    return `${parseInt(day)} ${months[parseInt(month) - 1]} ${year}`;
+  };
+
+  // ---------- Animation Variants ----------
+  const pageVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1, delayChildren: 0.2 },
+    },
+  };
+
+  const headerVariants = {
+    hidden: { opacity: 0, y: -30 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+  };
+
+  const pillsContainerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.05, delayChildren: 0.3 },
+    },
+  };
+
+  const pillVariants = {
+    hidden: { opacity: 0, scale: 0.9 },
+    visible: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 300, damping: 20 } },
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: (i) => ({
+      opacity: 1,
+      y: 0,
+      transition: { delay: i * 0.06, duration: 0.5, ease: "easeOut" },
+    }),
+  };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#FAF9F6] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#FF0000]"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#FAF9F6] flex items-center justify-center text-red-500">
+        Error: {error}
+      </div>
+    );
+  }
 
   return (
-    <section className="bg-[#FAF9F6] min-h-screen py-16 px-4 sm:px-6 lg:px-8 font-sans">
+    <motion.section
+      initial="hidden"
+      animate="visible"
+      variants={pageVariants}
+      className="bg-[#FAF9F6] min-h-screen py-16 px-4 sm:px-6 lg:px-8 font-sans"
+    >
       <div className="max-w-5xl mx-auto">
-
-        {/* Section Title */}
-        <div className="text-center mb-12">
-          <span className="text-xs font-bold uppercase tracking-widest text-[#FF0000]">Featured Posts</span>
-          <h2 className="text-4xl font-extrabold text-[#111111] mt-2 tracking-tight">
-            Latest Insights & Updates
+        {/* Header */}
+        <motion.div variants={headerVariants} className="text-center mb-10">
+          <motion.span
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+            className="inline-block text-xs font-bold uppercase tracking-[0.2em] text-[#FF0000] bg-red-50 px-4 py-1.5 rounded-full mb-3"
+          >
+            Featured Blogs
+          </motion.span>
+          <h2 className="text-4xl md:text-5xl font-serif font-bold text-gray-900 tracking-tight leading-tight">
+            Latest <span className="text-[#FF0000]">Insights & Updates</span>
           </h2>
-          <div className="h-1 w-16 bg-[#FF0000] mx-auto mt-4 rounded-full"></div>
-        </div>
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: 64 }}
+            transition={{ delay: 0.4, duration: 0.6 }}
+            className="h-1 bg-[#FF0000] mx-auto mt-4 rounded-full"
+          />
+        </motion.div>
 
-        {/* Category Filters */}
-        <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mb-16">
-          {categories.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => setActiveCategory(cat.id)}
-              className={`px-8 py-3.5 rounded-full font-semibold text-sm tracking-wide transition-all duration-300 border shadow-sm uppercase ${activeCategory === cat.id
-                ? 'bg-[#FF0000] text-white border-[#FF0000] scale-105 shadow-red-200'
-                : 'bg-white text-gray-700 border-gray-200 hover:border-[#FF0000] hover:text-[#FF0000]'
+        {/* Category Pills */}
+        <motion.div
+          variants={pillsContainerVariants}
+          initial="hidden"
+          animate="visible"
+          className="flex flex-wrap justify-center gap-3 md:gap-4 mb-16"
+        >
+          <motion.button
+            variants={pillVariants}
+            onClick={() => setActiveCategory("all")}
+            className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 shadow-sm ${
+              activeCategory === "all"
+                ? "bg-[#FF0000] text-white shadow-red-200 scale-105"
+                : "bg-white text-gray-700 hover:bg-[#FF0000]/10 hover:text-[#FF0000]"
+            }`}
+          >
+            All ({posts.length})
+          </motion.button>
+          {categoriesData.map((cat) => {
+            const Icon = iconMap[cat.icon];
+            const count = getPostCount(cat.slug);
+            return (
+              <motion.button
+                key={cat.id}
+                variants={pillVariants}
+                onClick={() => setActiveCategory(cat.slug)}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 shadow-sm ${
+                  activeCategory === cat.slug
+                    ? "bg-[#FF0000] text-white shadow-red-200 scale-105"
+                    : "bg-white text-gray-700 hover:bg-[#FF0000]/10 hover:text-[#FF0000]"
                 }`}
-            >
-              {cat.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Blog Cards Container */}
-        <div className="space-y-8">
-          {filteredBlogs.length > 0 ? (
-            filteredBlogs.map((blog) => (
-              <div
-                key={blog.id}
-                className="bg-white rounded-2xl border border-gray-100 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col md:flex-row group"
               >
-                {/* Left Side: Image */}
-                <div className="w-full md:w-[35%] h-64 md:h-auto relative overflow-hidden shrink-0">
-                  <img
-                    src={blog.image}
-                    alt={blog.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-                  />
-                  <span className="absolute top-4 left-4 bg-black/80 backdrop-blur-sm text-white text-[10px] uppercase font-bold tracking-widest px-3 py-1 rounded">
-                    {blog.category}
-                  </span>
-                </div>
+                {Icon && <Icon className="text-base" />}
+                {cat.name}
+                <span className="text-xs opacity-70 ml-0.5">({count})</span>
+              </motion.button>
+            );
+          })}
+        </motion.div>
 
-                {/* Right Side: Content */}
-                <div className="p-6 md:p-8 flex flex-col justify-between flex-grow">
-                  <div>
-                    <h3 className="text-xl md:text-2xl font-bold text-gray-900 leading-snug group-hover:text-[#FF0000] transition-colors duration-200">
-                      {blog.title}
-                    </h3>
-                    <p className="text-gray-600 mt-3 text-sm md:text-base leading-relaxed line-clamp-3">
-                      {blog.description}
-                    </p>
-                  </div>
-
-                  {/* Footer */}
-                  <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
-                    <span className="text-xs md:text-sm text-gray-400 font-medium flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#FF0000]"></span>
-                      {blog.date}
+        {/* Blog Cards */}
+        <AnimatePresence mode="wait">
+          {filteredPosts.length > 0 ? (
+            <motion.div
+              key={activeCategory}
+              initial="hidden"
+              animate="visible"
+              variants={pageVariants}
+              className="space-y-8"
+            >
+              {filteredPosts.map((post, index) => (
+                <motion.div
+                  key={post.id}
+                  custom={index}
+                  variants={cardVariants}
+                  whileHover={{ y: -5 }}
+                  className="bg-white rounded-2xl border border-gray-100 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col md:flex-row group"
+                >
+                  {/* Image */}
+                  <div className="w-full md:w-[35%] h-64 md:h-auto relative overflow-hidden shrink-0">
+                    <img
+                      src={post.image || "https://via.placeholder.com/600x400?text=No+Image"}
+                      alt={post.heading}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                    />
+                    <span className="absolute top-4 left-4 bg-black/80 backdrop-blur-sm text-white text-[10px] uppercase font-bold tracking-widest px-3 py-1 rounded">
+                      {post.category}
                     </span>
-
-                    {/* 3. Button par onClick listener attach kar diya jo sahi route par le jaye ga */}
-                    <button
-                      onClick={() => navigate(`/blog/${blog.id}`)}
-                      className="flex items-center gap-1 text-[#FF0000] font-bold text-sm tracking-wider uppercase group-hover:translate-x-1 transition-transform duration-200 hover:underline"
-                    >
-                      Read More
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                      </svg>
-                    </button>
                   </div>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="text-center py-12 text-gray-500">
-              No articles found for this category.
-            </div>
-          )}
-        </div>
 
+                  {/* Content */}
+                  <div className="p-6 md:p-8 flex flex-col justify-between grow">
+                    <div>
+                      <h3
+                        onClick={() => navigate(`/blog/${post.id}`)}
+                        className="text-xl md:text-2xl font-bold text-gray-900 leading-snug group-hover:text-[#FF0000] transition-colors duration-200 cursor-pointer"
+                      >
+                        {post.heading}
+                      </h3>
+                      <p className="text-gray-600 mt-3 text-sm md:text-base leading-relaxed line-clamp-3">
+                        {post.subHeading || post.description}
+                      </p>
+                    </div>
+
+                    {/* Footer */}
+                    <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
+                      <span className="text-xs md:text-sm text-gray-400 font-medium flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#FF0000]"></span>
+                        {formatDate(post.uploadedDate)}
+                      </span>
+                      <button
+                        onClick={() => navigate(`/blog/${post.id}`)}
+                        className="flex items-center gap-1 text-[#FF0000] font-bold text-sm tracking-wider uppercase group-hover:translate-x-1 transition-transform duration-200 hover:underline"
+                      >
+                        Read More
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="text-center py-12 text-gray-500"
+            >
+              No articles found for this category.
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
-    </section>
+    </motion.section>
   );
 };
 
-export default BlogSection;
+export default Blog;
