@@ -16,10 +16,9 @@ import {
 } from "react-icons/hi";
 import { FaImage } from "react-icons/fa";
 
-// ---------- API endpoint ----------
 const API_URL = "http://localhost:3001/posts";
+const UPLOAD_URL = "http://localhost:3001/upload";
 
-// ---------- Default empty post ----------
 const emptyPost = {
   id: 0,
   type: "news",
@@ -38,7 +37,6 @@ const emptyPost = {
   status: "active",
 };
 
-// ---------- Category list ----------
 const categories = [
   "politics",
   "sport",
@@ -50,6 +48,13 @@ const categories = [
   "disasters",
   "breaking news",
   "local",
+  "business",
+  "science",
+  "environment",
+  "lifestyle",
+  "world",
+  "crime",
+  "Opinion"
 ];
 
 const daysOfWeek = [
@@ -63,7 +68,6 @@ const daysOfWeek = [
 ];
 
 const Admin = () => {
-  // ---------- State ----------
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -73,11 +77,11 @@ const Admin = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
-  const [isSubmitting, setIsSubmitting] = useState(false); // ✅ Added
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const fileInputRef = useRef(null);
 
-  // ---------- Load posts from API ----------
+  // ---------- Load posts ----------
   const loadPosts = async () => {
     try {
       setLoading(true);
@@ -87,7 +91,6 @@ const Admin = () => {
       setPosts(data);
     } catch (err) {
       console.error("Error loading posts:", err);
-      // Fallback to localStorage if API fails
       const stored = localStorage.getItem("unfilterpoint_posts");
       if (stored) setPosts(JSON.parse(stored));
     } finally {
@@ -99,11 +102,10 @@ const Admin = () => {
     loadPosts();
   }, []);
 
-  // ---------- Save post (create or update) ----------
+  // ---------- Save post ----------
   const savePost = async (post) => {
     try {
       if (post.id === 0) {
-        // CREATE: remove id and POST
         const { id, ...newPost } = post;
         const res = await fetch(API_URL, {
           method: "POST",
@@ -114,7 +116,6 @@ const Admin = () => {
         const created = await res.json();
         setPosts((prev) => [created, ...prev]);
       } else {
-        // UPDATE: PUT
         const res = await fetch(`${API_URL}/${post.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -127,18 +128,17 @@ const Admin = () => {
     } catch (error) {
       console.error("Save error:", error);
       alert("Failed to save post. Check console for details.");
-      throw error; // rethrow so handleSubmit knows
+      throw error;
     }
   };
 
-  // ---------- Delete post ----------
+  // ---------- CRUD actions ----------
   const deletePost = async (id) => {
     if (!window.confirm("Are you sure you want to delete this post?")) return;
     await fetch(`${API_URL}/${id}`, { method: "DELETE" });
     setPosts((prev) => prev.filter((p) => p.id !== id));
   };
 
-  // ---------- Toggle active/inactive ----------
   const toggleStatus = async (id) => {
     const post = posts.find((p) => p.id === id);
     if (!post) return;
@@ -155,7 +155,6 @@ const Admin = () => {
     setPosts((prev) => prev.map((p) => (p.id === result.id ? result : p)));
   };
 
-  // ---------- Edit post (populate form) ----------
   const editPost = (post) => {
     setFormData({ ...post });
     setImagePreview(post.image || "");
@@ -164,12 +163,51 @@ const Admin = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // ---------- Reset form ----------
   const resetForm = () => {
     setFormData({ ...emptyPost });
     setImagePreview("");
     setEditingId(null);
     setShowForm(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  // ---------- Image upload (file → server) ----------
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.size > 10 * 1024 * 1024) {
+      alert("Image too large (max 10MB).");
+      return;
+    }
+
+    setUploadingImage(true);
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const res = await fetch(UPLOAD_URL, {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || "Upload failed");
+      }
+      const data = await res.json();
+      setFormData((prev) => ({ ...prev, image: data.imageUrl }));
+      setImagePreview(data.imageUrl);
+    } catch (err) {
+      console.error("Upload error:", err);
+      alert("Failed to upload image: " + err.message);
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const removeImage = () => {
+    setFormData((prev) => ({ ...prev, image: "" }));
+    setImagePreview("");
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -183,29 +221,8 @@ const Admin = () => {
     }
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64 = reader.result;
-      setFormData((prev) => ({ ...prev, image: base64 }));
-      setImagePreview(base64);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const removeImage = () => {
-    setFormData((prev) => ({ ...prev, image: "" }));
-    setImagePreview("");
-    if (fileInputRef.current) fileInputRef.current.value = "";
-  };
-
-  // ---------- Submit handler (with loading state) ----------
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submit triggered!"); // Debug
-
     if (!formData.heading || !formData.description || !formData.category) {
       alert("Please fill in heading, description, and category.");
       return;
@@ -225,19 +242,18 @@ const Admin = () => {
         uploadedDate,
         uploadedTime,
         day,
-        id: editingId || 0, // 0 means new
+        id: editingId || 0,
       };
       await savePost(postToSave);
       resetForm();
     } catch (error) {
-      // Error already handled in savePost
       console.error("Submit error:", error);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // ---------- Export JSON (backup) ----------
+  // ---------- Export / Import ----------
   const exportData = () => {
     const dataStr = JSON.stringify(posts, null, 2);
     const blob = new Blob([dataStr], { type: "application/json" });
@@ -249,7 +265,6 @@ const Admin = () => {
     URL.revokeObjectURL(url);
   };
 
-  // ---------- Import JSON (manual backup) ----------
   const importData = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -269,10 +284,10 @@ const Admin = () => {
       }
     };
     reader.readAsText(file);
-    e.target.value = ""; // reset input
+    e.target.value = "";
   };
 
-  // ---------- Filter & search ----------
+  // ---------- Filter & Search ----------
   const filteredPosts = posts
     .filter((p) => {
       if (filterType !== "all" && p.type !== filterType) return false;
@@ -289,13 +304,11 @@ const Admin = () => {
       );
     });
 
-  // ---------- Stats ----------
   const totalPosts = posts.length;
   const activePosts = posts.filter((p) => p.status === "active").length;
   const totalLikes = posts.reduce((sum, p) => sum + (p.likes || 0), 0);
   const totalComments = posts.reduce((sum, p) => sum + (p.comments || 0), 0);
 
-  // ---------- Loading ----------
   if (loading) {
     return (
       <div className="min-h-screen bg-[#f1f1f1] flex items-center justify-center">
@@ -307,7 +320,7 @@ const Admin = () => {
   return (
     <div className="min-h-screen bg-[#f1f1f1] py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* ---------- Header ---------- */}
+        {/* Header */}
         <div className="flex flex-wrap items-center justify-between mb-8 gap-4">
           <div>
             <h1 className="text-3xl font-extrabold text-black">Admin Panel</h1>
@@ -341,7 +354,7 @@ const Admin = () => {
           </div>
         </div>
 
-        {/* ---------- Stats ---------- */}
+        {/* Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-2xl shadow p-5 text-center">
             <p className="text-2xl font-bold text-black">{totalPosts}</p>
@@ -361,7 +374,7 @@ const Admin = () => {
           </div>
         </div>
 
-        {/* ---------- Add/Edit Form ---------- */}
+        {/* Add/Edit Form */}
         <AnimatePresence>
           {showForm && (
             <motion.div
@@ -477,7 +490,10 @@ const Admin = () => {
                         onChange={handleImageChange}
                         className="hidden"
                       />
-                      {imagePreview && (
+                      {uploadingImage && (
+                        <span className="ml-2 text-sm text-blue-500">Uploading...</span>
+                      )}
+                      {imagePreview && !uploadingImage && (
                         <button
                           type="button"
                           onClick={removeImage}
@@ -492,15 +508,6 @@ const Admin = () => {
                         <img
                           src={imagePreview}
                           alt="Preview"
-                          className="h-24 w-auto rounded-lg border border-gray-200 object-cover"
-                        />
-                      </div>
-                    )}
-                    {!imagePreview && formData.image && (
-                      <div className="mt-2">
-                        <img
-                          src={formData.image}
-                          alt="Existing"
                           className="h-24 w-auto rounded-lg border border-gray-200 object-cover"
                         />
                       </div>
@@ -612,7 +619,7 @@ const Admin = () => {
                   </button>
                   <button
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || uploadingImage}
                     className="px-6 py-2 bg-[#ff0000] text-white rounded-full font-bold shadow-md hover:shadow-lg transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                   >
                     {isSubmitting ? (
@@ -623,19 +630,8 @@ const Admin = () => {
                           fill="none"
                           viewBox="0 0 24 24"
                         >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          />
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          />
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                         </svg>
                         Saving...
                       </>
@@ -651,9 +647,9 @@ const Admin = () => {
           )}
         </AnimatePresence>
 
-        {/* ---------- Filters ---------- */}
+        {/* Filters */}
         <div className="flex flex-wrap items-center gap-4 mb-6">
-          <div className="flex items-center gap-2 bg-white rounded-full px-4 py-1 shadow-sm flex-1 min-w-[200px]">
+          <div className="flex items-center gap-2 bg-white rounded-full px-4 py-1 shadow-sm flex-1 min-w-50">
             <HiSearch className="text-gray-400" />
             <input
               type="text"
@@ -683,14 +679,12 @@ const Admin = () => {
           </select>
         </div>
 
-        {/* ---------- Posts Table ---------- */}
+        {/* Posts Table */}
         <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
           {filteredPosts.length === 0 ? (
             <div className="text-center py-16">
               <p className="text-gray-500 text-lg">No posts found.</p>
-              <p className="text-gray-400 text-sm">
-                Add your first post by clicking "Add New Post".
-              </p>
+              <p className="text-gray-400 text-sm">Add your first post by clicking "Add New Post".</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -711,74 +705,36 @@ const Admin = () => {
                   {filteredPosts.map((post) => (
                     <tr key={post.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-4 py-3 text-gray-500">{post.id}</td>
-                      <td className="px-4 py-3 font-medium text-black max-w-[200px] truncate">
+                      <td className="px-4 py-3 font-medium text-black max-w-50 truncate">
                         {post.heading}
                       </td>
                       <td className="px-4 py-3">
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs font-bold uppercase ${
-                            post.type === "news"
-                              ? "bg-blue-100 text-blue-700"
-                              : "bg-purple-100 text-purple-700"
-                          }`}
-                        >
+                        <span className={`px-2 py-1 rounded-full text-xs font-bold uppercase ${post.type === "news" ? "bg-blue-100 text-blue-700" : "bg-purple-100 text-purple-700"}`}>
                           {post.type}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-gray-600">{post.category}</td>
                       <td className="px-4 py-3">
-                        <span className="flex items-center gap-1">
-                          <HiThumbUp className="text-red-500" /> {post.likes || 0}
-                        </span>
+                        <span className="flex items-center gap-1"><HiThumbUp className="text-red-500" /> {post.likes || 0}</span>
                       </td>
                       <td className="px-4 py-3">
-                        <span className="flex items-center gap-1">
-                          <HiChatAlt className="text-blue-500" /> {post.comments || 0}
-                        </span>
+                        <span className="flex items-center gap-1"><HiChatAlt className="text-blue-500" /> {post.comments || 0}</span>
                       </td>
                       <td className="px-4 py-3">
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs font-bold ${
-                            post.status === "active"
-                              ? "bg-green-100 text-green-700"
-                              : "bg-gray-200 text-gray-600"
-                          }`}
-                        >
+                        <span className={`px-2 py-1 rounded-full text-xs font-bold ${post.status === "active" ? "bg-green-100 text-green-700" : "bg-gray-200 text-gray-600"}`}>
                           {post.status}
                         </span>
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <button
-                            onClick={() => editPost(post)}
-                            className="text-blue-600 hover:text-blue-800 p-1 rounded hover:bg-blue-50"
-                            title="Edit"
-                          >
+                          <button onClick={() => editPost(post)} className="text-blue-600 hover:text-blue-800 p-1 rounded hover:bg-blue-50" title="Edit">
                             <HiPencil className="text-lg" />
                           </button>
-                          <button
-                            onClick={() => deletePost(post.id)}
-                            className="text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-50"
-                            title="Delete"
-                          >
+                          <button onClick={() => deletePost(post.id)} className="text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-50" title="Delete">
                             <HiTrash className="text-lg" />
                           </button>
-                          <button
-                            onClick={() => toggleStatus(post.id)}
-                            className={`p-1 rounded ${
-                              post.status === "active"
-                                ? "text-gray-400 hover:text-gray-700 hover:bg-gray-100"
-                                : "text-green-600 hover:text-green-800 hover:bg-green-50"
-                            }`}
-                            title={
-                              post.status === "active" ? "Set Inactive" : "Set Active"
-                            }
-                          >
-                            {post.status === "active" ? (
-                              <HiEyeOff className="text-lg" />
-                            ) : (
-                              <HiEye className="text-lg" />
-                            )}
+                          <button onClick={() => toggleStatus(post.id)} className={`p-1 rounded ${post.status === "active" ? "text-gray-400 hover:text-gray-700 hover:bg-gray-100" : "text-green-600 hover:text-green-800 hover:bg-green-50"}`} title={post.status === "active" ? "Set Inactive" : "Set Active"}>
+                            {post.status === "active" ? <HiEyeOff className="text-lg" /> : <HiEye className="text-lg" />}
                           </button>
                         </div>
                       </td>

@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { NavLink } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   HiMenu,
@@ -10,13 +10,16 @@ import {
   HiBookOpen,
   HiTag,
   HiMail,
-  HiGlobeAlt, // Naya icon news ke liye
+  HiGlobeAlt,
 } from "react-icons/hi";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const inputRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -24,14 +27,28 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    if (searchOpen && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [searchOpen]);
+
   const toggleMenu = () => setIsOpen(!isOpen);
   const closeMenu = () => setIsOpen(false);
   const toggleSearch = () => setSearchOpen(!searchOpen);
 
-  // Home ke baad aur Blogs se pehle News add kar diya hai
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/category?q=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchOpen(false);
+      setSearchQuery("");
+    }
+  };
+
   const navItems = [
     { name: "Home", path: "/", icon: HiHome },
-    { name: "News", path: "/news", icon: HiGlobeAlt },
+    { name: "Updates", path: "/news", icon: HiGlobeAlt },
     { name: "Blogs", path: "/blogs", icon: HiBookOpen },
     { name: "Category", path: "/category", icon: HiTag },
     { name: "Contact", path: "/contact", icon: HiMail },
@@ -60,13 +77,15 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`sticky top-0 z-50 transition-all duration-300 ${scrolled
-        ? "bg-white/80 backdrop-blur-md shadow-lg"
-        : "bg-white shadow-md"
-        }`}
+      className={`sticky top-0 z-50 transition-all duration-300 ${
+        scrolled
+          ? "bg-white/80 backdrop-blur-md shadow-lg"
+          : "bg-white shadow-md"
+      }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
+          {/* Logo */}
           <NavLink to="/" className="flex items-center space-x-2 group">
             <motion.div
               whileHover={{ rotate: 360, scale: 1.1 }}
@@ -83,15 +102,17 @@ const Navbar = () => {
             </motion.span>
           </NavLink>
 
+          {/* Desktop Nav Items */}
           <div className="hidden md:flex items-center justify-center flex-1 space-x-1">
             {navItems.map((item) => (
               <NavLink
                 key={item.name}
                 to={item.path}
                 className={({ isActive }) =>
-                  `relative px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wide transition-all duration-200 ${isActive
-                    ? "text-white bg-[#ff0000] shadow-md"
-                    : "text-black hover:bg-[#ff0000]/10 hover:text-[#ff0000]"
+                  `relative px-4 py-2 rounded-full text-sm font-medium uppercase tracking-wide transition-all duration-200 ${
+                    isActive
+                      ? "text-white bg-[#ff0000] shadow-md"
+                      : "text-black hover:bg-[#ff0000]/10 hover:text-[#ff0000]"
                   }`
                 }
               >
@@ -112,7 +133,9 @@ const Navbar = () => {
             ))}
           </div>
 
+          {/* Right side: Search + News button */}
           <div className="flex items-center space-x-3">
+            {/* Search Icon */}
             <button
               onClick={toggleSearch}
               className="text-black hover:text-[#ff0000] transition-colors p-2 rounded-full hover:bg-[#f1f1f1]"
@@ -121,15 +144,22 @@ const Navbar = () => {
               <HiSearch className="h-5 w-5" />
             </button>
 
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="hidden md:flex bg-[#ff0000] text-white px-5 py-2 rounded-full text-sm font-semibold shadow-md hover:shadow-lg transition-shadow items-center gap-2"
+            {/* News Button (replaces Subscribe) */}
+            <NavLink
+              to="/news"
+              className={({ isActive }) =>
+                `hidden md:flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold shadow-md hover:shadow-lg transition-all ${
+                  isActive
+                    ? "bg-[#ff0000] text-white"
+                    : "bg-[#ff0000] text-white hover:scale-105"
+                }`
+              }
             >
               <HiBell className="text-lg" />
-              Subscribe
-            </motion.button>
+              News
+            </NavLink>
 
+            {/* Mobile Hamburger */}
             <div className="md:hidden">
               <button
                 onClick={toggleMenu}
@@ -143,6 +173,7 @@ const Navbar = () => {
         </div>
       </div>
 
+      {/* Search Bar */}
       <AnimatePresence>
         {searchOpen && (
           <motion.div
@@ -154,22 +185,35 @@ const Navbar = () => {
             style={{ top: "100%" }}
           >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-              <div className="flex items-center gap-4">
+              <form onSubmit={handleSearchSubmit} className="flex items-center gap-4">
                 <input
+                  ref={inputRef}
                   type="text"
                   placeholder="Search articles, categories, or topics..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   className="flex-1 px-4 py-2 border border-[#f1f1f1] rounded-full focus:outline-none focus:ring-2 focus:ring-[#ff0000] focus:border-transparent transition-shadow"
-                  autoFocus
                 />
-                <button onClick={toggleSearch} className="text-black hover:text-[#ff0000] transition-colors p-2">
+                <button
+                  type="submit"
+                  className="text-white bg-[#ff0000] px-4 py-2 rounded-full font-semibold hover:bg-red-700 transition"
+                >
+                  Search
+                </button>
+                <button
+                  type="button"
+                  onClick={toggleSearch}
+                  className="text-black hover:text-[#ff0000] transition-colors p-2"
+                >
                   <HiX className="h-6 w-6" />
                 </button>
-              </div>
+              </form>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
+      {/* Mobile Menu */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -200,9 +244,10 @@ const Navbar = () => {
                       to={item.path}
                       onClick={closeMenu}
                       className={({ isActive }) =>
-                        `flex items-center justify-center gap-4 py-3 px-6 rounded-xl transition-all duration-200 ${isActive
-                          ? "bg-[#ff0000] text-white shadow-lg"
-                          : "text-black hover:bg-[#ff0000]/10"
+                        `flex items-center justify-center gap-4 py-3 px-6 rounded-xl transition-all duration-200 ${
+                          isActive
+                            ? "bg-[#ff0000] text-white shadow-lg"
+                            : "text-black hover:bg-[#ff0000]/10"
                         }`
                       }
                     >
@@ -213,15 +258,15 @@ const Navbar = () => {
                 );
               })}
 
-              <motion.button
-                variants={itemVariants}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+              {/* Mobile "News" button (optional but consistent) */}
+              <NavLink
+                to="/news"
+                onClick={closeMenu}
                 className="mt-6 bg-[#ff0000] text-white px-8 py-3 rounded-full text-lg font-bold shadow-lg flex items-center gap-3"
               >
-                <HiBell /> Subscribe
-              </motion.button>
-            </motion.div>
+                <HiBell /> News
+              </NavLink>
+            </motion.div>  
           </motion.div>
         )}
       </AnimatePresence>
