@@ -1,12 +1,59 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
-const Marquee = () => {
-  const breakingNews =
-    "⚠️ BREAKING NEWS: Benzyo launches fully functional Instagram-style enterprise dashboard portal layout updates...";
+const API_URL = "http://localhost:3001/posts";
 
-  // Duplicate the text to create seamless loop
-  const items = [breakingNews, breakingNews, breakingNews, breakingNews];
+const Marquee = () => {
+  const [marqueeText, setMarqueeText] = useState(
+    "⚠️ BREAKING NEWS: Stay tuned for the latest updates..."
+  );
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchLatestMarquee = async () => {
+      try {
+        const res = await fetch(API_URL);
+        if (!res.ok) throw new Error("Failed to fetch posts"); 
+
+        const posts = await res.json();
+
+        // Filter active posts and sort by uploadedDate descending
+        const activePosts = posts
+          .filter((p) => p.status === "active")
+          .sort((a, b) => {
+            const dateA = new Date(`${a.uploadedDate}T${a.uploadedTime || "00:00"}`);
+            const dateB = new Date(`${b.uploadedDate}T${b.uploadedTime || "00:00"}`);
+            return dateB - dateA;
+          });
+
+        // Get the latest post with a marqueeText
+        const latestWithMarquee = activePosts.find((p) => p.marqueeText?.trim());
+        if (latestWithMarquee) {
+          setMarqueeText(latestWithMarquee.marqueeText);
+        }
+      } catch (err) {
+        console.error("Error fetching marquee:", err);
+        // Keep default text
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLatestMarquee();
+  }, []);
+
+  // Duplicate text for seamless loop
+  const items = [marqueeText, marqueeText, marqueeText, marqueeText];
+
+  if (loading) {
+    return (
+      <div className="relative w-full bg-gradient-to-r from-[#cc0000] via-[#ff0000] to-[#cc0000] border-y-2 border-red-700 shadow-lg overflow-hidden">
+        <div className="flex items-center py-4 px-4 text-white font-bold">
+          Loading marquee...
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative w-full bg-gradient-to-r from-[#cc0000] via-[#ff0000] to-[#cc0000] border-y-2 border-red-700 shadow-lg overflow-hidden">
@@ -23,7 +70,7 @@ const Marquee = () => {
         <motion.span
           className="relative flex h-3 w-3"
           animate={{ scale: [1, 1.2, 1] }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+          transition={{ duration: 0.5, repeat: Infinity, ease: "easeInOut" }}
         >
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
           <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
@@ -49,7 +96,7 @@ const Marquee = () => {
         ))}
       </motion.div>
 
-      {/* Gradient fades on edges for smooth effect */}
+      {/* Gradient fades on edges */}
       <div className="absolute left-0 top-0 h-full w-8 bg-gradient-to-r from-[#ff0000] to-transparent pointer-events-none"></div>
       <div className="absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-[#ff0000] to-transparent pointer-events-none"></div>
     </div>

@@ -12,6 +12,7 @@ const Homepage = () => {
       <TrendingSection />
       <NewsMarquee/>
       <MainFeedSection />
+      <Marquee/>
       
     </div>
   );

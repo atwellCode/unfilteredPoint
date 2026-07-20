@@ -32,8 +32,8 @@ const Footer = () => {
 
   const socialIcons = [
     { icon: FaFacebookF, link: "#", color: "#1877f2" },
-    { icon: FaTwitter, link: "#", color: "#1da1f2" },
-    { icon: FaInstagram, link: "#", color: "#e4405f" },
+    { icon: FaTwitter, link: "https://www.tiktok.com/@unfilteredpoints?_r=1&_t=ZS-986VWmzeqHI", color: "#1da1f2" },
+    { icon: FaInstagram, link: "https://www.instagram.com/unfilteredpoints?igsh=MWdzeXZibWdoZGx2cg%3D%3D&utm_source=qr", color: "#e4405f" },
     { icon: FaYoutube, link: "#", color: "#ff0000" },
     { icon: FaLinkedinIn, link: "#", color: "#0a66c2" },
   ];

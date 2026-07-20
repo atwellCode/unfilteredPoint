@@ -36,13 +36,13 @@ const NewsMarquee = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3, duration: 0.5 }}
-        className="absolute left-0 top-0 h-full w-35 bg-gradient-to-r from-[#ff0000] to-transparent z-10 pointer-events-none"
+        className="absolute left-0 top-0 h-full w-35 bg-linear-to-r from-[#ff0000] to-transparent z-10 pointer-events-none"
       />
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.4, duration: 0.5 }}
-        className="absolute right-0 top-0 h-full w-35 bg-gradient-to-l from-[#ff0000] to-transparent z-10 pointer-events-none"
+        className="absolute right-0 top-0 h-full w-35 bg-linear-to-l from-[#ff0000] to-transparent z-10 pointer-events-none"
       />
 
       {/* Scrolling container */}
@@ -62,7 +62,7 @@ const NewsMarquee = () => {
         {allImages.map((image, index) => (
           <motion.div
             key={index}
-            className="flex-shrink-0 flex items-center justify-center"
+            className="shrink-0 flex items-center justify-center"
             whileHover={{ scale: 1.1 }}
             transition={{ type: "spring", stiffness: 300 }}
           >

@@ -143,14 +143,14 @@ const TrendingSection = () => {
             to={`/blog/${mainBlog.id}`}
             className="group block relative rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-500"
           >
-            <div className="aspect-video md:aspect-[16/10] bg-gray-900 relative">
+            <div className="aspect-video md:aspect-16/10 bg-gray-900 relative">
               <img
                 src={mainBlog.image || "/placeholder-image.jpg"}
                 alt={mainBlog.heading}
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 onError={(e) => { e.target.src = "/placeholder-image.jpg"; }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+              <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/40 to-transparent"></div>
               <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
                 <div className="flex flex-wrap items-center gap-2 mb-3">
                   <span className="bg-[#FF0000] text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
@@ -185,14 +185,14 @@ const TrendingSection = () => {
               to={`/blog/${blog.id}`}
               className="group block flex-1 relative rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-500"
             >
-              <div className="aspect-video sm:aspect-[16/8] md:aspect-[16/7] lg:aspect-video bg-gray-900 relative">
+              <div className="aspect-video sm:aspect-16/8 md:aspect-16/7 lg:aspect-video bg-gray-900 relative">
                 <img
                   src={blog.image || "/placeholder-image.jpg"}
                   alt={blog.heading}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   onError={(e) => { e.target.src = "/placeholder-image.jpg"; }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+                <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/40 to-transparent"></div>
                 <div className="absolute bottom-0 left-0 right-0 p-4 md:p-5">
                   <div className="flex flex-wrap items-center gap-2 mb-2">
                     <span className="bg-[#FF0000] text-white text-[9px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
@@ -228,7 +228,7 @@ const TrendingSection = () => {
             View All Blogs
           </span>
           <HiArrowNarrowRight className="relative z-10 w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
-          <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></span>
+          <span className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></span>
         </Link>
       </motion.div>
     </motion.section>

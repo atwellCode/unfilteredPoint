@@ -280,7 +280,7 @@ const NewsPage = () => {
                     </div>
 
                     {/* Image – 4:5 */}
-                    <div className="aspect-[4/5] relative overflow-hidden bg-gray-50">
+                    <div className="aspect-4/5 relative overflow-hidden bg-gray-50">
                       <img
                         src={post.image || "/placeholder-image.jpg"}
                         alt={post.heading}
@@ -369,16 +369,16 @@ const NewsPage = () => {
                 <HiX className="w-6 h-6" />
               </button>
             </div>
-            <div className="p-4 flex-1 overflow-y-auto space-y-4 min-h-[250px]">
+            <div className="p-4 flex-1 overflow-y-auto space-y-4 min-h-62.5">
               {!activePost.comments || activePost.comments.length === 0 ? (
                 <p className="text-center text-sm text-gray-400 py-8">No comments yet. Start the conversation!</p>
               ) : (
                 activePost.comments.map((comment, index) => (
                   <div key={index} className="flex gap-3 items-start">
-                    <div className="w-7 h-7 bg-gray-200 rounded-full flex items-center justify-center font-bold text-xs text-gray-600 flex-shrink-0">
+                    <div className="w-7 h-7 bg-gray-200 rounded-full flex items-center justify-center font-bold text-xs text-gray-600 shrink-0">
                       U
                     </div>
-                    <div className="bg-gray-50 rounded-2xl p-3 text-sm text-gray-800 max-w-[85%] break-words">
+                    <div className="bg-gray-50 rounded-2xl p-3 text-sm text-gray-800 max-w-[85%] wrap-break-word">
                       {comment}
                     </div>
                   </div>
