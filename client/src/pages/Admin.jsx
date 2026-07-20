@@ -18,6 +18,11 @@ import {
 } from "react-icons/hi";
 import { FaImage } from "react-icons/fa";
 
+// TipTap imports
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+// Optional: import Emoji from "@tiptap/extension-emoji";
+
 const API_URL = "http://localhost:3001/posts";
 const UPLOAD_URL = "http://localhost:3001/upload";
 
@@ -49,6 +54,128 @@ const categories = [
 
 const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
+// ---------- Toolbar component for TipTap ----------
+const Toolbar = ({ editor }) => {
+  if (!editor) return null;
+
+  return (
+    <div className="flex flex-wrap gap-1 p-2 border-b border-gray-200 bg-gray-50 rounded-t-xl">
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleBold().run()}
+        className={`p-2 rounded hover:bg-gray-200 ${editor.isActive("bold") ? "bg-gray-300" : ""}`}
+        title="Bold"
+      >
+        <strong>B</strong>
+      </button>
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleItalic().run()}
+        className={`p-2 rounded hover:bg-gray-200 ${editor.isActive("italic") ? "bg-gray-300" : ""}`}
+        title="Italic"
+      >
+        <em>I</em>
+      </button>
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleUnderline().run()}
+        className={`p-2 rounded hover:bg-gray-200 ${editor.isActive("underline") ? "bg-gray-300" : ""}`}
+        title="Underline"
+      >
+        <u>U</u>
+      </button>
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleStrike().run()}
+        className={`p-2 rounded hover:bg-gray-200 ${editor.isActive("strike") ? "bg-gray-300" : ""}`}
+        title="Strikethrough"
+      >
+        <s>S</s>
+      </button>
+      <span className="w-px bg-gray-300 mx-1"></span>
+
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+        className={`p-2 rounded hover:bg-gray-200 ${editor.isActive("heading", { level: 1 }) ? "bg-gray-300" : ""}`}
+        title="Heading 1"
+      >
+        H1
+      </button>
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+        className={`p-2 rounded hover:bg-gray-200 ${editor.isActive("heading", { level: 2 }) ? "bg-gray-300" : ""}`}
+        title="Heading 2"
+      >
+        H2
+      </button>
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+        className={`p-2 rounded hover:bg-gray-200 ${editor.isActive("heading", { level: 3 }) ? "bg-gray-300" : ""}`}
+        title="Heading 3"
+      >
+        H3
+      </button>
+      <span className="w-px bg-gray-300 mx-1"></span>
+
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleBulletList().run()}
+        className={`p-2 rounded hover:bg-gray-200 ${editor.isActive("bulletList") ? "bg-gray-300" : ""}`}
+        title="Bullet List"
+      >
+        • List
+      </button>
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleOrderedList().run()}
+        className={`p-2 rounded hover:bg-gray-200 ${editor.isActive("orderedList") ? "bg-gray-300" : ""}`}
+        title="Numbered List"
+      >
+        1. List
+      </button>
+      <span className="w-px bg-gray-300 mx-1"></span>
+
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleBlockquote().run()}
+        className={`p-2 rounded hover:bg-gray-200 ${editor.isActive("blockquote") ? "bg-gray-300" : ""}`}
+        title="Blockquote"
+      >
+        “ Quote
+      </button>
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+        className={`p-2 rounded hover:bg-gray-200 ${editor.isActive("codeBlock") ? "bg-gray-300" : ""}`}
+        title="Code Block"
+      >
+        &lt;/&gt; Code
+      </button>
+      <span className="w-px bg-gray-300 mx-1"></span>
+
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().setHardBreak().run()}
+        className="p-2 rounded hover:bg-gray-200"
+        title="Line Break"
+      >
+        ↵
+      </button>
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().clearNodes().unsetAllMarks().run()}
+        className="p-2 rounded hover:bg-gray-200"
+        title="Clear formatting"
+      >
+        ✕
+      </button>
+    </div>
+  );
+};;
+
 const Admin = () => {
   const navigate = useNavigate();
 
@@ -65,6 +192,26 @@ const Admin = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const fileInputRef = useRef(null);
+
+  // ---------- TipTap editor ----------
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      // Emoji.configure({ ... }), // uncomment and install @tiptap/extension-emoji for emoji support
+    ],
+    content: formData.description,
+    onUpdate: ({ editor }) => {
+      // Update formData.description with the current HTML content
+      setFormData((prev) => ({ ...prev, description: editor.getHTML() }));
+    },
+  });
+
+  // When editing an existing post, update the editor content
+  useEffect(() => {
+    if (editor && formData.description !== editor.getHTML()) {
+      editor.commands.setContent(formData.description);
+    }
+  }, [formData.description, editor]);
 
   // ---------- Load posts ----------
   const loadPosts = async () => {
@@ -83,7 +230,6 @@ const Admin = () => {
     }
   };
 
-  // ✅ Added missing useEffect to load posts on mount
   useEffect(() => {
     loadPosts();
   }, []);
@@ -152,6 +298,8 @@ const Admin = () => {
     setEditingId(null);
     setShowForm(false);
     if (fileInputRef.current) fileInputRef.current.value = "";
+    // Reset editor content to empty
+    if (editor) editor.commands.setContent("");
   };
 
   // ---------- Image upload ----------
@@ -280,8 +428,6 @@ const Admin = () => {
 
   const totalPosts = posts.length;
   const activePosts = posts.filter((p) => p.status === "active").length;
-  const totalLikes = posts.reduce((sum, p) => sum + (p.likes || 0), 0);
-  const totalComments = posts.reduce((sum, p) => sum + (p.comments || 0), 0);
 
   if (loading) {
     return (
@@ -317,7 +463,6 @@ const Admin = () => {
               <HiUpload /> Import JSON
               <input type="file" accept=".json" onChange={importData} className="hidden" />
             </label>
-            {/* Logout Button */}
             <button
               onClick={handleLogout}
               className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-5 py-2 rounded-full font-semibold flex items-center gap-2 transition-all"
@@ -336,14 +481,6 @@ const Admin = () => {
           <div className="bg-white rounded-2xl shadow p-5 text-center">
             <p className="text-2xl font-bold text-green-600">{activePosts}</p>
             <p className="text-gray-500 text-sm">Active</p>
-          </div>
-          <div className="bg-white rounded-2xl shadow p-5 text-center">
-            <p className="text-2xl font-bold text-red-500">{totalLikes}</p>
-            <p className="text-gray-500 text-sm">Total Likes</p>
-          </div>
-          <div className="bg-white rounded-2xl shadow p-5 text-center">
-            <p className="text-2xl font-bold text-blue-500">{totalComments}</p>
-            <p className="text-gray-500 text-sm">Total Comments</p>
           </div>
         </div>
 
@@ -381,10 +518,6 @@ const Admin = () => {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Sub Heading</label>
                     <input type="text" name="subHeading" value={formData.subHeading} onChange={handleChange} className="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-[#ff0000] focus:border-transparent" placeholder="Enter sub heading" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Description *</label>
-                    <textarea name="description" rows="4" value={formData.description} onChange={handleChange} className="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-[#ff0000] focus:border-transparent" placeholder="Write full content..." />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Marquee Text</label>
@@ -461,6 +594,15 @@ const Admin = () => {
                   </div>
                 </div>
 
+                {/* Description - full width with TipTap editor */}
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Description *</label>
+                  <div className="border border-gray-300 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-[#ff0000]">
+                    <Toolbar editor={editor} />
+                    <EditorContent editor={editor} className="p-4 min-h-50 prose max-w-none" />
+                  </div>
+                </div>
+
                 <div className="md:col-span-2 flex justify-end gap-4 pt-4 border-t border-gray-100">
                   <button type="button" onClick={resetForm} className="px-6 py-2 border border-gray-300 rounded-full font-medium hover:bg-gray-50">Cancel</button>
                   <button type="submit" disabled={isSubmitting || uploadingImage} className="px-6 py-2 bg-[#ff0000] text-white rounded-full font-bold shadow-md hover:shadow-lg transition-all hover:scale-105 disabled:opacity-50 flex items-center gap-2">
@@ -479,7 +621,7 @@ const Admin = () => {
 
         {/* Filters & Table */}
         <div className="flex flex-wrap items-center gap-4 mb-6">
-          <div className="flex items-center gap-2 bg-white rounded-full px-4 py-1 shadow-sm flex-1 min-w-[200px]">
+          <div className="flex items-center gap-2 bg-white rounded-full px-4 py-1 shadow-sm flex-1 min-w-50">
             <HiSearch className="text-gray-400" />
             <input type="text" placeholder="Search posts..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full py-2 outline-none bg-transparent text-sm" />
           </div>
@@ -520,7 +662,7 @@ const Admin = () => {
                   {filteredPosts.map((post) => (
                     <tr key={post.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-4 py-3 text-gray-500">{post.id}</td>
-                      <td className="px-4 py-3 font-medium text-black max-w-[200px] truncate">{post.heading}</td>
+                      <td className="px-4 py-3 font-medium text-black max-w-50 truncate">{post.heading}</td>
                       <td className="px-4 py-3">
                         <span className={`px-2 py-1 rounded-full text-xs font-bold uppercase ${post.type === "news" ? "bg-blue-100 text-blue-700" : "bg-purple-100 text-purple-700"}`}>
                           {post.type}

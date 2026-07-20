@@ -140,9 +140,11 @@ const BlogDetailPage = () => {
               Updated: {formatDate(post.uploadedDate)}
             </div>
 
-            <div className="text-gray-700 text-base sm:text-lg leading-relaxed space-y-6 whitespace-pre-line">
-              {post.description || post.subHeading}
-            </div>
+            {/* ✅ RICH TEXT DESCRIPTION with dangerouslySetInnerHTML */}
+            <div
+              className="prose max-w-none text-gray-700 text-base sm:text-lg leading-relaxed overflow-x-auto"
+              dangerouslySetInnerHTML={{ __html: post.description || post.subHeading }}
+            />
           </div>
 
           {/* Sidebar – Related Posts */}

@@ -1,10 +1,9 @@
-import { NavLink } from "react-router-dom";
+import { Link } from "react-router-dom"; // ← import Link
 import { motion } from "framer-motion";
 import {
   FaFacebookF,
-  FaTwitter,
+  FaTiktok,
   FaInstagram,
-  FaYoutube,
   FaLinkedinIn,
 } from "react-icons/fa";
 import { HiLocationMarker, HiPhone, HiOutlineMail } from "react-icons/hi";
@@ -13,7 +12,6 @@ import { FiSend } from "react-icons/fi";
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
-  // Quick links
   const quickLinks = [
     { name: "Home", path: "/" },
     { name: "Blogs", path: "/blogs" },
@@ -32,9 +30,8 @@ const Footer = () => {
 
   const socialIcons = [
     { icon: FaFacebookF, link: "#", color: "#1877f2" },
-    { icon: FaTwitter, link: "https://www.tiktok.com/@unfilteredpoints?_r=1&_t=ZS-986VWmzeqHI", color: "#1da1f2" },
+    { icon: FaTiktok, link: "https://www.tiktok.com/@unfilteredpoints?_r=1&_t=ZS-986VWmzeqHI", color: "#1da1f2" },
     { icon: FaInstagram, link: "https://www.instagram.com/unfilteredpoints?igsh=MWdzeXZibWdoZGx2cg%3D%3D&utm_source=qr", color: "#e4405f" },
-    { icon: FaYoutube, link: "#", color: "#ff0000" },
     { icon: FaLinkedinIn, link: "#", color: "#0a66c2" },
   ];
 
@@ -73,7 +70,6 @@ const Footer = () => {
                   whileHover={{ y: -4, scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-300 hover:text-white transition-colors duration-300"
-                  style={{ hover: { color: social.color } }}
                   aria-label={social.icon.name}
                 >
                   <social.icon className="text-sm" />
@@ -95,18 +91,18 @@ const Footer = () => {
             <ul className="space-y-2">
               {quickLinks.map((link) => (
                 <li key={link.name}>
-                  <NavLink
+                  <Link
                     to={link.path}
                     className="hover:text-[#ff0000] transition-colors duration-200 text-sm"
                   >
                     {link.name}
-                  </NavLink>
+                  </Link>
                 </li>
               ))}
             </ul>
           </motion.div>
 
-          {/* Column 3: Categories */}
+          {/* Column 3: Categories – now with working links */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -119,12 +115,12 @@ const Footer = () => {
             <ul className="space-y-2">
               {categories.map((cat) => (
                 <li key={cat}>
-                  <a
-                    href="#"
+                  <Link
+                    to={`/category/${cat.toLowerCase()}`}
                     className="hover:text-[#ff0000] transition-colors duration-200 text-sm"
                   >
                     {cat}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -176,7 +172,7 @@ const Footer = () => {
           </motion.div>
         </div>
 
-        {/* Copyright Bar with Developer Credit */}
+        {/* Copyright Bar */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}

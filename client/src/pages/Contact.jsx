@@ -8,7 +8,7 @@ import {
   HiMail,
   HiChatAlt,
 } from "react-icons/hi";
-import { FaPaperPlane, FaFacebookF, FaTwitter, FaInstagram, FaYoutube } from "react-icons/fa";
+import { FaPaperPlane, FaFacebookF, FaTiktok, FaInstagram, FaYoutube } from "react-icons/fa";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -51,7 +51,7 @@ const Contact = () => {
 
   const socialLinks = [
     { icon: FaFacebookF, link: "#", color: "#1877f2" },
-    { icon: FaTwitter, link: "https://www.tiktok.com/@unfilteredpoints?_r=1&_t=ZS-986VWmzeqHI", color: "#1da1f2" },
+    { icon: FaTiktok, link: "https://www.tiktok.com/@unfilteredpoints?_r=1&_t=ZS-986VWmzeqHI", color: "#1da1f2" },
     { icon: FaInstagram, link: "https://www.instagram.com/unfilteredpoints?igsh=MWdzeXZibWdoZGx2cg%3D%3D&utm_source=qr", color: "#e4405f" },
     { icon: FaYoutube, link: "#", color: "#ff0000" },
   ];

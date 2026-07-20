@@ -47,7 +47,7 @@ const Marquee = () => {
 
   if (loading) {
     return (
-      <div className="relative w-full bg-gradient-to-r from-[#cc0000] via-[#ff0000] to-[#cc0000] border-y-2 border-red-700 shadow-lg overflow-hidden">
+      <div className="relative w-full bg-linear-to-r from-[#cc0000] via-[#ff0000] to-[#cc0000] border-y-2 border-red-700 shadow-lg overflow-hidden">
         <div className="flex items-center py-4 px-4 text-white font-bold">
           Loading marquee...
         </div>
@@ -56,10 +56,10 @@ const Marquee = () => {
   }
 
   return (
-    <div className="relative w-full bg-gradient-to-r from-[#cc0000] via-[#ff0000] to-[#cc0000] border-y-2 border-red-700 shadow-lg overflow-hidden">
+    <div className="relative w-full bg-linear-to-r from-[#cc0000] via-[#ff0000] to-[#cc0000] border-y-2 border-red-700 shadow-lg overflow-hidden">
       {/* Animated background glow */}
       <motion.div
-        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent"
+        className="absolute inset-0 bg-linear-to-r from-transparent via-white/5 to-transparent"
         animate={{ x: ["-100%", "100%"] }}
         transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
         style={{ pointerEvents: "none" }}
@@ -90,15 +90,15 @@ const Marquee = () => {
             key={index}
             className="text-white font-bold tracking-wide text-sm sm:text-base md:text-lg flex items-center gap-6 mx-8"
           >
-            <span className="inline-block w-2 h-2 bg-white/70 rounded-full flex-shrink-0"></span>
+            <span className="inline-block w-2 h-2 bg-white/70 rounded-full shrink-0"></span>
             {text}
           </span>
         ))}
       </motion.div>
 
       {/* Gradient fades on edges */}
-      <div className="absolute left-0 top-0 h-full w-8 bg-gradient-to-r from-[#ff0000] to-transparent pointer-events-none"></div>
-      <div className="absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-[#ff0000] to-transparent pointer-events-none"></div>
+      <div className="absolute left-0 top-0 h-full w-8 bg-linear-to-r from-[#ff0000] to-transparent pointer-events-none"></div>
+      <div className="absolute right-0 top-0 h-full w-8 bg-linear-to-l from-[#ff0000] to-transparent pointer-events-none"></div>
     </div>
   );
 };
