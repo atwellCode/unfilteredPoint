@@ -71,7 +71,7 @@ const Contact = () => {
       />
 
       <div className="max-w-6xl w-full relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-8 bg-white/60 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden border border-white/50">
-        {/* LEFT SIDE – Brand & Info */}
+       
         <div className="bg-linear-to-br from-[#ff0000] to-black p-8 md:p-12 flex flex-col justify-between text-white">
           <div>
 
